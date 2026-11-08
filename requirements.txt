@@ -1,0 +1,13 @@
+# Windows, Python 3.12 x64. Tkinter and SQLite come with Python.
+# Easiest: double-click Check_And_Install.bat (checks before installing).
+# Manual CMD: py -3.12 -m pip install --user -r requirements.txt
+# OneOCR engine files are checked separately by Check_And_Install.bat.
+oneocr
+mss
+pynput
+Pillow
+numpy
+PyAutoGUI
+playwright
+SudachiPy
+sudachidict_core

@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+keybindings.json
+.keybindings-*.tmp
+hover_dict_cache.db*
+BotChromeProfile/
+*.dll
+*.onemodel
