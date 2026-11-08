@@ -1,5 +1,5 @@
 """
-Hover Dict 5.3.1 Simple — OneOCR + DeepL, Windows / Python 3.12 x64.
+Hover Dict 5.3.2 Simple — OneOCR + DeepL, Windows / Python 3.12 x64.
 
 First run: Check_And_Install.bat (checks and installs missing requirements).
 Use: Start_Hover_Dict.bat. Change keys in the same application window, Save,
@@ -8,7 +8,7 @@ Edit keys without starting OCR: Start_Hover_Dict.bat settings
 
 Default controls: 2 lookup; hold 1 to collect words; 3 refresh OCR; F8 virtual
 pointer for games/VNs hiding or recentering the mouse; Left Alt + arrows nudge;
-F9 experimental Japanese segmentation; Esc exit. Supported text: Latin only.
+Esc exits. Supported text: Latin only.
 Some games, including HOI4, currently do not work.
 
 In the dedicated DeepL Chrome window, complete any verification manually,
@@ -40,141 +40,230 @@ from typing import Optional
 
 
 
-# Key settings are embedded here; no helper module is needed.
-CONFIG_PATH = Path(__file__).with_name("keybindings.json")
-
+# Key bindings use Windows virtual-key IDs, so the editor needs no key-name whitelist.
+CONFIG_PATH = Path(__file__).with_name('keybindings.json')
 DEFAULT_BINDINGS = {
-    "collect": "1",
-    "lookup": "2",
-    "refresh": "3",
-    "toggle_pointer": "f8",
-    "toggle_japanese": "f9",
-    "exit": "esc",
-    "pointer_modifier": "alt_l",
-    "pointer_left": "left",
-    "pointer_right": "right",
-    "pointer_up": "up",
-    "pointer_down": "down",
+    'collect': 0x31, 'lookup': 0x32, 'refresh': 0x33, 'toggle_pointer': 0x77,
+    'exit': 0x1B, 'pointer_modifier': 0xA4, 'pointer_left': 0x25,
+    'pointer_right': 0x27, 'pointer_up': 0x26, 'pointer_down': 0x28,
 }
-
 ACTION_LABELS = {
-    "collect": "Giữ để gom từ / Hold to collect words",
-    "lookup": "Dịch từ / Translate word",
-    "refresh": "Quét OCR lại / Refresh OCR",
-    "toggle_pointer": "Con trỏ ảo cho game/VN ẩn chuột / Virtual pointer",
-    "toggle_japanese": "Tách từ Nhật thử nghiệm / Experimental Japanese",
-    "exit": "Thoát Hover Dict / Exit",
-    "pointer_modifier": "Phím giữ khi chỉnh con trỏ / Nudge modifier",
-    "pointer_left": "Dời con trỏ sang trái / Nudge left",
-    "pointer_right": "Dời con trỏ sang phải / Nudge right",
-    "pointer_up": "Dời con trỏ lên / Nudge up",
-    "pointer_down": "Dời con trỏ xuống / Nudge down",
+    'collect': 'Hold to collect words', 'lookup': 'Translate word',
+    'refresh': 'Refresh OCR', 'toggle_pointer': 'Toggle virtual pointer',
+    'exit': 'Exit Hover Dict', 'pointer_modifier': 'Hold to move the virtual pointer',
+    'pointer_left': 'Move left', 'pointer_right': 'Move right',
+    'pointer_up': 'Move up', 'pointer_down': 'Move down',
 }
-
-SPECIAL_VKS = {
-    "backspace": 0x08, "tab": 0x09, "enter": 0x0D, "caps_lock": 0x14,
-    "esc": 0x1B, "space": 0x20, "page_up": 0x21, "page_down": 0x22,
-    "end": 0x23, "home": 0x24, "left": 0x25, "up": 0x26,
-    "right": 0x27, "down": 0x28, "insert": 0x2D, "delete": 0x2E,
-    **{f"f{number}": 0x6F + number for number in range(1, 13)},
+NAMED_KEYS = {
+    'backspace': 0x08, 'tab': 0x09, 'clear': 0x0C, 'enter': 0x0D,
+    'pause': 0x13, 'caps_lock': 0x14, 'esc': 0x1B, 'space': 0x20,
+    'page_up': 0x21, 'page_down': 0x22, 'end': 0x23, 'home': 0x24,
+    'left': 0x25, 'up': 0x26, 'right': 0x27, 'down': 0x28,
+    'print_screen': 0x2C, 'insert': 0x2D, 'delete': 0x2E, 'help': 0x2F,
+    'cmd_l': 0x5B, 'cmd_r': 0x5C, 'menu': 0x5D, 'sleep': 0x5F,
+    'multiply': 0x6A, 'add': 0x6B, 'separator': 0x6C, 'subtract': 0x6D,
+    'decimal': 0x6E, 'divide': 0x6F, 'num_lock': 0x90, 'scroll_lock': 0x91,
+    'shift_l': 0xA0, 'shift_r': 0xA1, 'ctrl_l': 0xA2, 'ctrl_r': 0xA3,
+    'alt_l': 0xA4, 'alt_r': 0xA5, 'browser_back': 0xA6, 'browser_forward': 0xA7,
+    'browser_refresh': 0xA8, 'browser_stop': 0xA9, 'browser_search': 0xAA,
+    'browser_favorites': 0xAB, 'browser_home': 0xAC,
+    'volume_mute': 0xAD, 'volume_down': 0xAE, 'volume_up': 0xAF,
+    'media_next': 0xB0, 'media_previous': 0xB1, 'media_stop': 0xB2,
+    'media_play_pause': 0xB3, 'launch_mail': 0xB4, 'launch_media': 0xB5,
+    **{f'f{i}': 0x6F+i for i in range(1,25)},
+    **{f'numpad_{i}': 0x60+i for i in range(10)},
 }
-
-KEY_CHOICES = tuple(string.digits + string.ascii_lowercase) + tuple(SPECIAL_VKS)
-
-MODIFIER_CHOICES = ("alt_l", "alt_r", "ctrl_l", "ctrl_r", "shift_l", "shift_r", "cmd_l", "cmd_r")
-
-_ALIASES = {
-    "escape": "esc", "return": "enter", "spacebar": "space",
-    "ctrl": "ctrl_l", "control": "ctrl_l", "shift": "shift_l",
-    "alt": "alt_l", "cmd": "cmd_l", "win": "cmd_l", "alt_gr": "alt_r",
-    "left_ctrl": "ctrl_l", "right_ctrl": "ctrl_r",
-    "left_alt": "alt_l", "right_alt": "alt_r",
-    "left_shift": "shift_l", "right_shift": "shift_r",
-    "left_win": "cmd_l", "right_win": "cmd_r",
+MODIFIER_KEYS = frozenset((0x5B,0x5C,0xA0,0xA1,0xA2,0xA3,0xA4,0xA5))
+ALIASES = {
+    'escape':'esc', 'return':'enter', 'spacebar':'space', 'ctrl':'ctrl_l',
+    'control':'ctrl_l', 'alt':'alt_l', 'alt_gr':'alt_r', 'shift':'shift_l',
+    'cmd':'cmd_l', 'win':'cmd_l', 'left_ctrl':'ctrl_l', 'right_ctrl':'ctrl_r',
+    'left_alt':'alt_l', 'right_alt':'alt_r', 'left_shift':'shift_l',
+    'right_shift':'shift_r', 'left_win':'cmd_l', 'right_win':'cmd_r',
 }
+KEY_NAMES = {code:name.replace('_',' ').title() for name,code in NAMED_KEYS.items()}
+KEY_NAMES.update({0x5B:'Left Win',0x5C:'Right Win',0xA0:'Left Shift',0xA1:'Right Shift',
+                  0xA2:'Left Ctrl',0xA3:'Right Ctrl',0xA4:'Left Alt',0xA5:'Right Alt',
+                  0xBA:';',0xBB:'=',0xBC:',',0xBD:'-',0xBE:'.',0xBF:'/',0xC0:'`',
+                  0xDB:'[',0xDC:'\\',0xDD:']',0xDE:"'",0xE2:'OEM 102'})
 
-def normalize_key(value: str) -> str:
-    if not isinstance(value, str):
-        raise ValueError("Key names must be strings")
-    name = value.strip().lower().removeprefix("key.").replace(" ", "_").replace("-", "_")
-    name = _ALIASES.get(name, name)
-    if name not in KEY_CHOICES and name not in MODIFIER_CHOICES:
-        raise ValueError(f"Unsupported key {value!r}; choose one letter, digit, F1-F12 or a listed key")
-    return name
 
-def validate_bindings(data: dict) -> dict[str, str]:
-    if not isinstance(data, dict):
-        raise ValueError("Keybindings must be a JSON object")
-    unknown = set(data) - set(DEFAULT_BINDINGS)
+def normalize_key(value) -> int:
+    if type(value) is int and 1 <= value <= 254:
+        return value
+    if isinstance(value,str):
+        name=value.strip().lower().removeprefix('key.').replace(' ','_').replace('-','_')
+        name=ALIASES.get(name,name)
+        if name in NAMED_KEYS:
+            return NAMED_KEYS[name]
+        if len(name)==1 and name in string.ascii_lowercase+string.digits:
+            return ord(name.upper())
+        if name.startswith('vk:'):
+            try:
+                return normalize_key(int(name[3:],0))
+            except (ValueError,TypeError):
+                pass
+    raise ValueError('Invalid key. Click the action button and press a keyboard key.')
+
+
+def validate_bindings(data: dict) -> dict[str,int]:
+    if not isinstance(data,dict):
+        raise ValueError('Keybindings must be a JSON object.')
+    unknown=set(data)-set(DEFAULT_BINDINGS)
     if unknown:
-        raise ValueError("Unknown action(s): " + ", ".join(sorted(map(str, unknown))))
-    bindings = DEFAULT_BINDINGS.copy()
-    for action, value in data.items():
-        bindings[action] = normalize_key(value)
-    used = {}
-    for action, key in bindings.items():
-        allowed = MODIFIER_CHOICES if action == "pointer_modifier" else KEY_CHOICES
-        if key not in allowed:
-            raise ValueError(f"Invalid key {key!r} for {action}")
+        raise ValueError('Unknown action(s): '+', '.join(sorted(map(str,unknown))))
+    values=DEFAULT_BINDINGS.copy()
+    values.update({action:normalize_key(key) for action,key in data.items()})
+    used={}
+    for action,key in values.items():
         if key in used:
-            raise ValueError(f"Duplicate key {key!r}: {used[key]} and {action}")
-        used[key] = action
-    return bindings
+            raise ValueError(f'{display_key(key)} is already assigned to {ACTION_LABELS[used[key]]}.')
+        used[key]=action
+    return values
 
-def load_bindings(path: Path = CONFIG_PATH) -> dict[str, str]:
+
+def load_bindings(path: Path=CONFIG_PATH) -> dict[str,int]:
     try:
-        text = Path(path).read_text(encoding="utf-8-sig")
+        data=json.loads(Path(path).read_text(encoding='utf-8-sig'))
     except FileNotFoundError:
         return DEFAULT_BINDINGS.copy()
-    return validate_bindings(json.loads(text))
+    if not isinstance(data,dict):
+        raise ValueError('Keybindings must be a JSON object.')
+    # Retain bindings from older versions, ignoring actions no longer present.
+    return validate_bindings({a:k for a,k in data.items() if a in DEFAULT_BINDINGS})
 
-def save_bindings(path: Path, data: dict) -> dict[str, str]:
-    bindings = validate_bindings(data)
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = None
+
+def save_bindings(path: Path,data: dict) -> dict[str,int]:
+    bindings=validate_bindings(data)
+    path=Path(path)
+    path.parent.mkdir(parents=True,exist_ok=True)
+    temporary=None
     try:
-        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent,
-                                         prefix=".keybindings-", suffix=".tmp", delete=False) as output:
-            temporary = Path(output.name)
-            json.dump(bindings, output, ensure_ascii=False, indent=2)
-            output.write("\n")
-        os.replace(temporary, path)
+        with tempfile.NamedTemporaryFile(mode='w',encoding='utf-8',dir=path.parent,
+                                         prefix='.keybindings-',suffix='.tmp',delete=False) as output:
+            temporary=Path(output.name)
+            json.dump(bindings,output,indent=2)
+            output.write('\n')
+        os.replace(temporary,path)
     finally:
         if temporary is not None:
             temporary.unlink(missing_ok=True)
     return bindings
 
-def event_key_name(key) -> str | None:
-    """Return a key identity even when Ctrl/Shift changes its typed character."""
-    name = getattr(key, "name", None)
-    char = getattr(key, "char", None)
-    value = name if isinstance(name, str) else char
-    if value is not None:
+
+def event_key_name(key) -> int | None:
+    if type(key) is int:
+        return key if 1 <= key <= 254 else None
+    vk=getattr(key,'vk',getattr(getattr(key,'value',None),'vk',None))
+    if type(vk) is int and 1 <= vk <= 254:
+        return _windows_key_code(vk,0,0)
+    value=getattr(key,'name',None) or getattr(key,'char',None)
+    try:
+        return normalize_key(value)
+    except ValueError:
+        return None
+
+
+def display_key(key) -> str:
+    code=normalize_key(key)
+    if 0x30 <= code <= 0x39 or 0x41 <= code <= 0x5A:
+        return chr(code)
+    if 0x70 <= code <= 0x87:
+        return f'F{code-0x6F}'
+    return KEY_NAMES.get(code,f'Key 0x{code:02X}')
+
+
+def _windows_key_code(vk,scan,flags):
+    if vk==0x10:
+        return 0xA1 if scan==0x36 else 0xA0
+    if vk==0x11:
+        return 0xA3 if flags & 1 else 0xA2
+    if vk==0x12:
+        return 0xA5 if flags & 1 else 0xA4
+    return vk if type(vk) is int and 1 <= vk <= 254 else None
+
+
+class KeyCapture:
+    """Capture one key without losing suppressed key-down/key-up pairs."""
+    def __init__(self):
+        self._lock=threading.Lock()
+        self._active=False
+        self._first=None
+        self._down=set()
+        self._suppressed=set()
+        self._results=queue.SimpleQueue()
+
+    @property
+    def active(self):
+        with self._lock:
+            return self._active
+
+    def _clear_results(self):
+        while True:
+            try:
+                self._results.get_nowait()
+            except queue.Empty:
+                return
+
+    def begin(self,held_keys=()):
+        with self._lock:
+            self._clear_results()
+            self._down.update(held_keys)
+            self._active=True
+            self._first=None
+
+    def cancel(self):
+        with self._lock:
+            self._active=False
+            self._first=None
+            self._clear_results()
+
+    def feed(self,code,down):
+        with self._lock:
+            if not down:
+                self._down.discard(code)
+                if code not in self._suppressed:
+                    return False
+                self._suppressed.remove(code)
+                if self._active and code==self._first:
+                    self._results.put(code)
+                    self._active=False
+                    self._first=None
+                return True
+            repeated=code in self._down
+            self._down.add(code)
+            if code in self._suppressed:
+                return True
+            if not self._active or repeated:
+                return False
+            self._suppressed.add(code)
+            if self._first is None:
+                self._first=code
+            return True
+
+    def poll(self):
         try:
-            return normalize_key(value)
-        except ValueError:
-            pass  # Ctrl+A / Shift+4 still have a stable Windows virtual key.
-    vk = getattr(key, "vk", None)
-    if isinstance(vk, int):
-        if 0x41 <= vk <= 0x5A:
-            return chr(vk).lower()
-        if 0x30 <= vk <= 0x39:
-            return chr(vk)
-        if 0x60 <= vk <= 0x69:
-            return str(vk - 0x60)
-        return next((name for name, code in SPECIAL_VKS.items() if code == vk), None)
-    return None
+            return self._results.get_nowait()
+        except queue.Empty:
+            return None
 
-def display_key(name: str) -> str:
-    labels = {"alt_l": "Left Alt", "alt_r": "Right Alt", "ctrl_l": "Left Ctrl",
-              "ctrl_r": "Right Ctrl", "shift_l": "Left Shift", "shift_r": "Right Shift",
-              "cmd_l": "Left Win", "cmd_r": "Right Win"}
-    return labels.get(name, name.replace("_", " ").upper())
 
-KEY_BINDINGS = DEFAULT_BINDINGS.copy()
-_editing_keys = threading.Event()
-_held_modifiers = set()
+def _currently_down_keys():
+    if os.name!='nt':
+        return ()
+    import ctypes
+    get_state=ctypes.windll.user32.GetAsyncKeyState
+    get_state.argtypes=(ctypes.c_int,)
+    get_state.restype=ctypes.c_short
+    return (code for code in range(8,255) if get_state(code) & 0x8000)
+
+
+KEY_BINDINGS=DEFAULT_BINDINGS.copy()
+_key_capture=KeyCapture()
+_editing_keys=threading.Event()
+_held_modifiers=set()
+_pressed_keys=set()
+
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 CAPTURE_FPS = 24             # chỉ chụp vùng đang đọc trong chế độ tự động
@@ -225,7 +314,7 @@ def _get_ocr():
     global _ocr_engine
     if _ocr_engine is None:
         import oneocr
-        print("⏳ Đang load OneOCR (đọc DLL native từ Snipping Tool)...")
+        print("Loading OneOCR (native Snipping Tool engine)...")
         _ocr_engine = oneocr.OcrEngine()
         print("✅ OneOCR ready")
     return _ocr_engine
@@ -390,83 +479,7 @@ def _quad_to_bbox(rect: Optional[dict]) -> Optional[tuple[int, int, int, int]]:
 
 
 # ─── OCR ──────────────────────────────────────────────────────────────────────
-_japanese_tokenizer = None
-_japanese_tokenizer_unavailable = False
-
-def _has_kana(text: str) -> bool:
-    return any(
-        "\u3040" <= c <= "\u30ff" or "\u31f0" <= c <= "\u31ff" or "\uff66" <= c <= "\uff9f"
-        for c in text
-    )
-
-def _has_japanese_script(text: str) -> bool:
-    return _has_kana(text) or any(
-        "\u3400" <= c <= "\u9fff" or "\uf900" <= c <= "\ufaff"
-        or "\U00020000" <= c <= "\U000323af" for c in text
-    )
-
-def _compact_text(text: str) -> str:
-    return "".join(unicodedata.normalize("NFKC", text).split())
-
-def _japanese_spans(text: str) -> list[tuple[int, int]]:
-    global _japanese_tokenizer, _japanese_tokenizer_unavailable
-    if _japanese_tokenizer_unavailable:
-        return []
-    if _japanese_tokenizer is None:
-        try:
-            from sudachipy import Dictionary
-            dictionary = Dictionary(dict="core")
-            factory = getattr(dictionary, "tokenizer", dictionary.create)
-            _japanese_tokenizer = factory()
-        except (ImportError, OSError, RuntimeError, ValueError) as e:
-            _japanese_tokenizer_unavailable = True
-            print(f"Tách từ Nhật chưa khả dụng: {e}")
-            print("Cài: py -3.12 -m pip install sudachipy sudachidict_core")
-            return []
-    return [(word.begin(), word.end()) for word in _japanese_tokenizer.tokenize(text)
-            if any(c.isalnum() for c in word.surface())]
-
-def _japanese_line_tokens(line: dict) -> list[Token]:
-    text = _compact_text(line.get("text") or "")
-    if not text:
-        return []
-
-    parts = []
-    for word in line.get("words") or []:
-        chars = _compact_text(word.get("text") or "")
-        box = _quad_to_bbox(word.get("bounding_rect"))
-        if chars and box:
-            parts.append((chars, box))
-
-    line_box = _quad_to_bbox(line.get("bounding_rect"))
-    if "".join(chars for chars, _ in parts) != text:
-        if line_box is None:
-            return []
-        parts = [(text, line_box)]
-
-    vertical = line_box is not None and line_box[3] - line_box[1] > (line_box[2] - line_box[0]) * 1.5
-    char_boxes = []
-    for chars, (x1, y1, x2, y2) in parts:
-        length = len(chars)
-        for i in range(length):
-            if vertical:
-                lo = y1 + (y2 - y1) * i // length
-                hi = y1 + (y2 - y1) * (i + 1) // length
-                char_boxes.append((x1, lo, x2, max(lo, hi - (i + 1 < length))))
-            else:
-                lo = x1 + (x2 - x1) * i // length
-                hi = x1 + (x2 - x1) * (i + 1) // length
-                char_boxes.append((lo, y1, max(lo, hi - (i + 1 < length)), y2))
-
-    tokens = []
-    for start, end in _japanese_spans(text):
-        boxes = char_boxes[start:end]
-        if boxes:
-            tokens.append(Token(text[start:end], min(b[0] for b in boxes), min(b[1] for b in boxes),
-                                max(b[2] for b in boxes), max(b[3] for b in boxes)))
-    return tokens
-
-def _run_ocr(img_array: np.ndarray, force_japanese: bool = False) -> list[Token]:
+def _run_ocr(img_array: np.ndarray) -> list[Token]:
     """
     OneOCR.recognize_pil() trả về dict: {'text', 'text_angle', 'lines': [...]}.
     Mỗi line có 'text', 'bounding_rect' (tứ giác cấp DÒNG), và 'words' — list
@@ -481,16 +494,9 @@ def _run_ocr(img_array: np.ndarray, force_japanese: bool = False) -> list[Token]
     img_gray = None
     all_tokens: list[Token] = []
     lines = result.get("lines") or []
-    japanese = force_japanese or any(_has_kana(line.get("text") or "") for line in lines)
     for line in lines:
         words = line.get("words") or []
         line_text = (line.get("text") or "").strip()
-        if japanese and _has_japanese_script(line_text):
-            segmented = _japanese_line_tokens(line)
-            if segmented:
-                all_tokens.extend(segmented)
-                continue
-
         used_native = False
         for w in words:
             w_text = (w.get("text") or "").strip()
@@ -570,7 +576,7 @@ def _bgra(raw) -> np.ndarray:
 def _rgb(raw) -> np.ndarray:
     return _bgra(raw)[:, :, 2::-1]
 
-def _capture_key(raw, area, region, japanese):
+def _capture_key(raw, area, region):
     if area == region:
         sig = _screen_sig(raw)
     else:
@@ -578,7 +584,7 @@ def _capture_key(raw, area, region, japanese):
         y = region["top"] - area["top"]
         crop = _bgra(raw)[y:y + region["height"], x:x + region["width"]]
         sig = hashlib.blake2b(crop.tobytes(), digest_size=12).digest()
-    return (region["left"], region["top"], region["width"], region["height"], japanese, sig)
+    return (region["left"], region["top"], region["width"], region["height"], sig)
 
 
 def _word_screen_sig(raw, area, token):
@@ -589,15 +595,15 @@ def _word_screen_sig(raw, area, token):
     crop = _bgra(raw)[y1:y2, x1:x2, :3]  # ignore unused alpha bytes
     return hashlib.blake2b(crop.tobytes(), digest_size=12).digest()
 
-def _ocr_tokens(img, left, top, japanese, scale=1):
+def _ocr_tokens(img, left, top, scale=1):
     return [Token(t.word, left + t.x1 // scale, top + t.y1 // scale,
                   left + t.x2 // scale, top + t.y2 // scale)
-            for t in _run_ocr(img, japanese)]
+            for t in _run_ocr(img)]
 
 def _hit_token(tokens, point):
     return next((token for token in tokens if token.contains(*point)), None)
 
-def _retry_lookup(img, region, point, japanese):
+def _retry_lookup(img, region, point):
     # Một lần đọc phóng 2× sát con trỏ khi bản gốc bỏ sót chữ.
     from PIL import Image
     left, top = region["left"], region["top"]
@@ -608,7 +614,7 @@ def _retry_lookup(img, region, point, japanese):
         return None
     crop = Image.fromarray(img[y1:y2, x1:x2]).resize(
         (2 * (x2 - x1), 2 * (y2 - y1)), Image.Resampling.BICUBIC)
-    return _hit_token(_ocr_tokens(np.asarray(crop), left + x1, top + y1, japanese, 2), point)
+    return _hit_token(_ocr_tokens(np.asarray(crop), left + x1, top + y1, 2), point)
 
 # ─── DeepL desktop app (UI Automation) ────────────────────────────────────────
 _deepl_lock = threading.Lock()   # chỉ 1 request DeepL tại 1 thời điểm (UI dùng chung)
@@ -688,9 +694,9 @@ def _deepl_resolve_controls(force_refresh: bool = False):
     win = _deepl_find_window()
     if win is None:
         raise RuntimeError(
-            f"Không tìm thấy cửa sổ DeepL desktop THẬT (đang tìm tên chứa "
-            f"'{DEEPL_WINDOW_NAME_HINT}', loại trừ cửa sổ trình duyệt). "
-            "Hãy chắc chắn app DeepL desktop (không phải tab trình duyệt) đang mở."
+            f"Cannot find the DeepL desktop window (looking for a title containing "
+            f"'{DEEPL_WINDOW_NAME_HINT}', excluding browser windows). "
+            "Make sure the DeepL desktop application is open."
         )
 
     input_ctrl = None
@@ -712,9 +718,9 @@ def _deepl_resolve_controls(force_refresh: bool = False):
         edits = _deepl_collect_edit_controls(win)
         if len(edits) < 2:
             raise RuntimeError(
-                f"Auto-detect chỉ tìm được {len(edits)} ô text trong cửa sổ DeepL, cần ít nhất 2 "
-                "(input + output). Hãy kiểm tra UI Automation và đặt "
-                "DEEPL_INPUT_AUTOMATION_ID / DEEPL_OUTPUT_AUTOMATION_ID thủ công."
+                f"Auto-detection found only {len(edits)} text controls in DeepL; at least 2 are required "
+                "(input + output). Inspect UI Automation and set "
+                "DEEPL_INPUT_AUTOMATION_ID / DEEPL_OUTPUT_AUTOMATION_ID manually."
             )
 
         def area(c):
@@ -735,7 +741,7 @@ def _deepl_resolve_controls(force_refresh: bool = False):
                     break
 
     if input_ctrl is None or output_ctrl is None:
-        raise RuntimeError("Không xác định được control input/output của DeepL.")
+        raise RuntimeError("Cannot identify the DeepL input/output controls.")
 
     _deepl_window = win
     _deepl_input_ctrl = input_ctrl
@@ -778,7 +784,7 @@ def _deepl_set_text(ctrl, text: str):
             return
     except Exception:
         pass
-    raise RuntimeError("Control input của DeepL không hỗ trợ set text qua UI Automation.")
+    raise RuntimeError("The DeepL input control does not support setting text through UI Automation.")
 
 
 def translate_deepl_app(text: str) -> str:
@@ -797,7 +803,7 @@ def translate_deepl_app(text: str) -> str:
         try:
             _win, input_ctrl, output_ctrl = _deepl_resolve_controls()
         except Exception as e:
-            print(f"DeepL app: không lấy được control ({e})")
+            print(f"DeepL app: cannot find controls ({e})")
             return ""
 
         # đọc baseline output TRƯỚC khi set input mới, để biết khi nó đổi
@@ -809,12 +815,12 @@ def translate_deepl_app(text: str) -> str:
         try:
             _deepl_set_text(input_ctrl, text)
         except Exception as e:
-            print(f"DeepL app: set text input lỗi, thử tìm lại control... ({e})")
+            print(f"DeepL app: setting input failed; retrying control detection... ({e})")
             try:
                 _win, input_ctrl, output_ctrl = _deepl_resolve_controls(force_refresh=True)
                 _deepl_set_text(input_ctrl, text)
             except Exception as e2:
-                print(f"DeepL app: set text input lỗi lần 2, bỏ cuộc ({e2})")
+                print(f"DeepL app: setting input failed again ({e2})")
                 return ""
 
         start = time.time()
@@ -885,8 +891,8 @@ def _deepl_web_worker(ready: Future):
             browser = pw.chromium.connect_over_cdp(DEEPL_WEB_CDP_URL)
         except Exception as e:
             raise RuntimeError(
-                f"Không kết nối được Chrome qua CDP ({DEEPL_WEB_CDP_URL}). "
-                f"Hãy chạy Start_Hover_Dict.bat trước và để cửa sổ Chrome đó mở. ({e})"
+                f"Cannot connect to Chrome through CDP ({DEEPL_WEB_CDP_URL}). "
+                f"Run Start_Hover_Dict.bat and keep its Chrome window open. ({e})"
             )
 
         context = browser.contexts[0] if browser.contexts else browser.new_context()
@@ -966,7 +972,7 @@ def _deepl_web_worker(ready: Future):
         try:
             result = _deepl_web_translate_on_page(page, text, is_superseded)
         except Exception as e:
-            print(f"DeepL web: lỗi khi dịch ({e})")
+            print(f"DeepL web: translation failed ({e})")
             result = ""
         if result is not None:
             is_superseded()
@@ -1038,11 +1044,11 @@ def _deepl_web_translate_on_page(page, text: str, is_superseded=None) -> Optiona
     started = time.monotonic()
     if is_superseded is None:
         is_superseded = lambda: not _pw_request_q.empty()
-    print(f"DeepL web: đang dịch '{text[:40]}...'" if len(text) > 40 else f"DeepL web: đang dịch '{text}'")
+    print(f"DeepL web: translating '{text[:40]}...'" if len(text) > 40 else f"DeepL web: translating '{text}'")
     input_box = _deepl_web_get_input_box(page)
     output_box = _deepl_web_get_output_box(page)
     if output_box is None:
-        print("DeepL web: không tìm thấy ô output trên trang.")
+        print("DeepL web: cannot find the output field on the page.")
         return ""
 
     # Observe before filling: a brief clear can occur entirely between polls.
@@ -1097,7 +1103,7 @@ def _deepl_web_translate_on_page(page, text: str, is_superseded=None) -> Optiona
 
     elapsed_ms = round((time.monotonic() - started) * 1000)
     print(f"DeepL web: {elapsed_ms} ms — '{result[:60]}'" if result else
-          f"DeepL web: {elapsed_ms} ms — chưa có kết quả mới, không dùng bản dịch cũ.")
+          f"DeepL web: {elapsed_ms} ms — no new result; previous translation discarded.")
     return result
 
 
@@ -1115,7 +1121,7 @@ def _deepl_web_ensure_worker_started(wait: bool = True):
         try:
             ready.result(timeout=35.0)
         except TimeoutError as e:
-            raise RuntimeError("Timeout chờ trình duyệt DeepL web khởi động.") from e
+            raise RuntimeError("Timed out while waiting for the DeepL browser to start.") from e
     return ready
 
 
@@ -1133,7 +1139,7 @@ def translate_deepl_web(text: str, request_id: Optional[int] = None) -> str:
     try:
         _deepl_web_ensure_worker_started()
     except Exception as e:
-        print(f"DeepL web: không khởi tạo được trình duyệt ({e})")
+        print(f"DeepL web: browser initialisation failed ({e})")
         return ""
 
     result_q: "queue.Queue" = queue.Queue()
@@ -1149,7 +1155,7 @@ def translate_deepl_web(text: str, request_id: Optional[int] = None) -> str:
     try:
         result = result_q.get(timeout=DEEPL_WEB_TIMEOUT + 5.0)
     except queue.Empty:
-        print("DeepL web: timeout chờ kết quả từ worker thread.")
+        print("DeepL web: timed out waiting for the translation worker.")
         return ""
 
     if result is None:
@@ -1185,14 +1191,12 @@ _request_lock = threading.Lock()
 _pending_lookup = None
 _refresh_requested = False
 _request_id = 0
-_force_japanese = False
 
 _pointer_lock = threading.Lock()
 _pointer_enabled = False
 _virtual_pointer = None
 _pointer_bounds = None
 _pointer_modifier_held = False
-_toggle_keys_down = set()
 
 def _lookup_point():
     with _pointer_lock:
@@ -1289,7 +1293,7 @@ class _RawMouseInput:
                 _pointer_bounds = (left, top, left + self._user32.GetSystemMetrics(78),
                                     top + self._user32.GetSystemMetrics(79))
         if not self._comctl.SetWindowSubclass(hwnd, self._callback, self._subclass_id, 0):
-            raise OSError("Không cài được bộ đọc Raw Input cho cửa sổ Tk.")
+            raise OSError("Cannot attach Raw Input to the Tk window.")
 
     def _register(self, enabled):
         ctypes = self._ctypes
@@ -1300,7 +1304,7 @@ class _RawMouseInput:
                                                 ctypes.sizeof(device)):
             self._registered = enabled
             return True
-        print(f"Raw Input: đăng ký chuột lỗi {ctypes.get_last_error()}; dùng các phím di chuyển con trỏ đã đặt.")
+        print(f"Raw Input: mouse registration failed: {ctypes.get_last_error()}; use the configured pointer movement keys.")
         return False
 
     def sync(self):
@@ -1347,7 +1351,7 @@ def _take_requests():
         refresh = _refresh_requested
         _pending_lookup = None
         _refresh_requested = False
-        return lookup, refresh, _force_japanese
+        return lookup, refresh
 
 
 def _publish_ocr_state(tokens, raw, area):
@@ -1444,7 +1448,7 @@ def _ocr_loop():
         if _exit_requested.is_set():
             break
         next_capture = time.monotonic() + 1.0 / CAPTURE_FPS
-        lookup, refresh, japanese = _take_requests()
+        lookup, refresh = _take_requests()
         if lookup is not None:
             if lookup[1] != lookup_retry_seq:
                 lookup_retry_seq = lookup[1]
@@ -1463,29 +1467,29 @@ def _ocr_loop():
             area = desktop if refresh else region
             raw = sct.grab(area)
         except Exception as e:
-            print(f"Không capture được màn hình: {e}")
+            print(f"Cannot capture the screen: {e}")
             if _requeue_lookup(lookup, lookup_attempts):
                 last_key = None
             _exit_requested.wait(0.25)
             continue
 
-        key = _capture_key(raw, area, region, japanese)
+        key = _capture_key(raw, area, region)
         if refresh or key != last_key:
             if DEBUG_OCR:
                 print(f"[OCR] {area['width']}x{area['height']}")
             img = _rgb(raw)
             try:
-                tokens = _ocr_tokens(img, area["left"], area["top"], japanese)
+                tokens = _ocr_tokens(img, area["left"], area["top"])
             except Exception as e:
-                print(f"OCR lỗi: {e}")
+                print(f"OCR failed: {e}")
                 if _requeue_lookup(lookup, lookup_attempts):
                     last_key = None
                 _exit_requested.wait(0.25)
                 continue
             last_key = key
             if refresh:
-                hit_status = "có từ dưới con trỏ" if _hit_token(tokens, point) else "chưa có từ dưới con trỏ"
-                print(f"[OCR] Quét toàn màn hình: {len(tokens)} token, {hit_status}.")
+                hit_status = "word found at the pointer" if _hit_token(tokens, point) else "no word at the pointer"
+                print(f"[OCR] Full-screen refresh: {len(tokens)} token, {hit_status}.")
 
         _publish_ocr_state(tokens, raw, area)
         if lookup is not None:
@@ -1496,15 +1500,15 @@ def _ocr_loop():
             hit = _hit_token(tokens, point)
             if hit is None:
                 try:
-                    hit = _retry_lookup(_rgb(raw), area, point, japanese)
+                    hit = _retry_lookup(_rgb(raw), area, point)
                 except Exception as e:
-                    print(f"OCR phóng to lỗi: {e}")
+                    print(f"Magnified OCR failed: {e}")
             if hit is None:
                 if _requeue_lookup(lookup, lookup_attempts):
                     # A missed read must be retried even on identical pixels.
                     last_key = None
                     continue
-                print(f"[Tra từ] Chưa đọc được chữ tại điểm bấm sau {lookup_attempts} lần thử.")
+                print(f"[Lookup] No word found at the selected point after {lookup_attempts} attempts.")
             signature = _word_screen_sig(raw, area, hit) if hit is not None else None
             if _set_lookup_result(hit, seq, snapshot=tokens, signature=signature) and hit is not None:
                 _publish_ocr_state(tokens, raw, area)
@@ -1515,7 +1519,7 @@ def _trigger_send_translate():
     try:
         point = _lookup_point()
     except Exception as e:
-        print(f"Không lấy được vị trí chuột: {e}")
+        print(f"Cannot read the pointer position: {e}")
         return
     with _request_lock:
         _request_id += 1
@@ -1547,99 +1551,124 @@ def _matches_single_key(key) -> bool:
     return event_key_name(key) == KEY_BINDINGS["lookup"]
 
 def _reset_keyboard_state():
-    global _ctrl_held, _pointer_modifier_held
+    global _ctrl_held,_pointer_modifier_held
     with _ctrl_lock:
-        _ctrl_held = False
+        _ctrl_held=False
         _ctrl_buffer.clear()
     _held_modifiers.clear()
-    _toggle_keys_down.clear()
-    _pointer_modifier_held = False
+    _pressed_keys.clear()
+    _pointer_modifier_held=False
+
 
 def _on_key_press(key):
-    global _ctrl_held, _pointer_enabled, _virtual_pointer, _force_japanese, _pointer_modifier_held
-    global _request_id, _pending_lookup
+    global _ctrl_held,_pointer_enabled,_virtual_pointer,_pointer_modifier_held
+    global _request_id,_pending_lookup
     if _editing_keys.is_set():
         return
-    name = event_key_name(key)
-    if name is None:
+    code=event_key_name(key)
+    if code is None:
         return
-    if name in MODIFIER_CHOICES:
-        _held_modifiers.add(name)
-        if name == KEY_BINDINGS["pointer_modifier"]:
-            _pointer_modifier_held = True
+    repeated=code in _pressed_keys
+    _pressed_keys.add(code)
+    if code in MODIFIER_KEYS:
+        _held_modifiers.add(code)
+    if code==KEY_BINDINGS['pointer_modifier']:
+        _pointer_modifier_held=True
         return
     if _pointer_modifier_held and _pointer_enabled:
-        movement = {KEY_BINDINGS["pointer_left"]: (-12, 0),
-                    KEY_BINDINGS["pointer_right"]: (12, 0),
-                    KEY_BINDINGS["pointer_up"]: (0, -12),
-                    KEY_BINDINGS["pointer_down"]: (0, 12)}
-        if name in movement:
-            _nudge_pointer(*movement[name])
+        movement={KEY_BINDINGS['pointer_left']:(-12,0),KEY_BINDINGS['pointer_right']:(12,0),
+                  KEY_BINDINGS['pointer_up']:(0,-12),KEY_BINDINGS['pointer_down']:(0,12)}
+        if code in movement:
+            _nudge_pointer(*movement[code])
             return
-    if _held_modifiers:
-        return  # Leave Ctrl/Alt/Shift/Win shortcuts to the foreground application.
-    if _matches_combo_key(key):
-        started = False
+    if repeated or _held_modifiers-{code}:
+        return
+    if code==KEY_BINDINGS['collect']:
+        started=False
         with _ctrl_lock:
             if not _ctrl_held:
-                _ctrl_held = True
+                _ctrl_held=True
                 _ctrl_buffer.clear()
-                started = True
+                started=True
         if started:
             with _request_lock:
-                _request_id += 1
-                _pending_lookup = None
+                _request_id+=1
+                _pending_lookup=None
                 with _hover_lock:
-                    _hover.token = None
-                    _hover.meaning = ""
-                    _hover.lookup_target = None
-                    _hover.pinned = False
-                    _hover.pin_origin = None
-    elif _matches_single_key(key):
+                    _hover.token=None
+                    _hover.meaning=''
+                    _hover.lookup_target=None
+                    _hover.pinned=False
+                    _hover.pin_origin=None
+    elif code==KEY_BINDINGS['lookup']:
         _trigger_send_translate()
-    elif name == KEY_BINDINGS["refresh"]:
+    elif code==KEY_BINDINGS['refresh']:
         _trigger_ocr_refresh()
-    elif name == KEY_BINDINGS["exit"]:
+    elif code==KEY_BINDINGS['exit']:
         _exit_requested.set()
         _ocr_wakeup.set()
-    elif name in (KEY_BINDINGS["toggle_pointer"], KEY_BINDINGS["toggle_japanese"]):
-        if name in _toggle_keys_down:
+    elif code==KEY_BINDINGS['toggle_pointer']:
+        try:
+            point=_lookup_point()
+        except Exception as error:
+            print(f'Cannot find the initial virtual pointer position: {error}')
             return
-        _toggle_keys_down.add(name)
-        if name == KEY_BINDINGS["toggle_pointer"]:
-            try:
-                point = _lookup_point()
-            except Exception as e:
-                print(f"Không lấy được vị trí ban đầu cho chuột ảo: {e}")
-                return
-            with _pointer_lock:
-                _pointer_enabled = not _pointer_enabled
-                _virtual_pointer = point if _pointer_enabled else None
-            _ocr_wakeup.set()
-        else:
-            with _request_lock:
-                _force_japanese = not _force_japanese
-            print("Tách từ Nhật:", "ép bật" if _force_japanese else "tự động")
-            _ocr_wakeup.set()
+        with _pointer_lock:
+            _pointer_enabled=not _pointer_enabled
+            _virtual_pointer=point if _pointer_enabled else None
+        _ocr_wakeup.set()
+
 
 def _on_key_release(key):
-    global _ctrl_held, _request_id, _pointer_modifier_held
-    name = event_key_name(key)
-    _held_modifiers.discard(name)
-    _toggle_keys_down.discard(name)
-    if name == KEY_BINDINGS["pointer_modifier"]:
-        _pointer_modifier_held = False
-    if _matches_combo_key(key):
+    global _ctrl_held,_request_id,_pointer_modifier_held
+    code=event_key_name(key)
+    _pressed_keys.discard(code)
+    _held_modifiers.discard(code)
+    if code==KEY_BINDINGS['pointer_modifier']:
+        _pointer_modifier_held=False
+    if code==KEY_BINDINGS['collect']:
         with _ctrl_lock:
-            was_held = _ctrl_held
-            _ctrl_held = False
-            selected = list(_ctrl_buffer.values())
+            was_held=_ctrl_held
+            _ctrl_held=False
+            selected=list(_ctrl_buffer.values())
             _ctrl_buffer.clear()
         if was_held and selected:
             with _request_lock:
-                _request_id += 1
-                seq = _request_id
-            threading.Thread(target=_flush_ctrl_buffer, args=(selected, seq), daemon=True).start()
+                _request_id+=1
+                seq=_request_id
+            threading.Thread(target=_flush_ctrl_buffer,args=(selected,seq),daemon=True).start()
+
+
+def _make_keyboard_listener(handle_actions=True):
+    def event_filter(msg,data):
+        if msg not in (0x100,0x101,0x104,0x105):
+            return False
+        # Windows marks the synthetic Ctrl half of AltGr with this scan code.
+        if data.vkCode in (0x11,0xA2) and data.scanCode==0x021D:
+            return False
+        code=_windows_key_code(data.vkCode,data.scanCode,data.flags)
+        if code is None:
+            return False
+        down=msg in (0x100,0x104)
+        captured=_key_capture.feed(code,down)
+        if code==0x13 and down:
+            _key_capture.feed(code,False)  # Pause has no key-up event on Windows.
+        if captured:
+            listener.suppress_event()
+        if handle_actions:
+            if code==0x13:
+                if down:
+                    if code in (KEY_BINDINGS['collect'],KEY_BINDINGS['pointer_modifier']):
+                        (_on_key_release if code in _pressed_keys else _on_key_press)(code)
+                    else:
+                        _on_key_press(code)
+                        _on_key_release(code)
+            else:
+                (_on_key_press if down else _on_key_release)(code)
+        return False  # The OS receives normal input; avoid duplicate pynput callbacks.
+    listener=keyboard.Listener(win32_event_filter=event_filter)
+    return listener
+
 
 # ─── Hover + drag buffer ───────────────────────────────────────────────────────
 class _HoverState:
@@ -1663,61 +1692,111 @@ def _flush_ctrl_buffer(toks: list[Token], seq: int):
 
 # ─── Tkinter UI ───────────────────────────────────────────────────────────────
 class KeyboardSettings(tk.Frame):
-    """The key editor lives in the same application, with no extra launcher."""
-    def __init__(self, parent, config_path=CONFIG_PATH):
+    def __init__(self,parent,config_path=CONFIG_PATH):
         from tkinter import ttk
         super().__init__(parent)
-        self.config_path = Path(config_path)
-        self.fields = {action: tk.StringVar(self, value=key) for action, key in KEY_BINDINGS.items()}
-        self.status = tk.StringVar(self, value="Đổi phím rồi bấm Lưu / Choose keys, then Save.")
-        ttk.Label(self, text="Hover Dict — Phím điều khiển / Controls", font=("Segoe UI", 14, "bold")).pack(anchor="w")
-        ttk.Label(self, text="Thu nhỏ cửa sổ hoặc chuyển về game để dùng phím.\n"
-                  "Minimise this window or return to your game to use the hotkeys.",
-                  wraplength=680).pack(anchor="w", pady=(8, 12))
-        tabs = ttk.Notebook(self)
-        tabs.pack(fill="both", expand=True)
-        for title, actions in (
-            ("Thao tác / Actions", [a for a in DEFAULT_BINDINGS if not a.startswith("pointer_")]),
-            ("Di chuyển con trỏ / Pointer", [a for a in DEFAULT_BINDINGS if a.startswith("pointer_")]),
+        self.config_path=Path(config_path)
+        self.fields={a:tk.IntVar(self,value=k) for a,k in KEY_BINDINGS.items()}
+        self.buttons={}
+        self.capture_action=None
+        self.status=tk.StringVar(self,value='Click a key button, then press and release a keyboard key.')
+        ttk.Label(self,text='Hover Dict — Controls',font=('Segoe UI',14,'bold')).pack(anchor='w')
+        ttk.Label(self,text='Click the button next to an action to choose its key.\n'
+                  'Minimise this window or return to your game to use the hotkeys.',
+                  wraplength=680).pack(anchor='w',pady=(8,12))
+        tabs=ttk.Notebook(self)
+        tabs.pack(fill='both',expand=True)
+        for title,actions in (
+            ('Actions',[a for a in DEFAULT_BINDINGS if not a.startswith('pointer_')]),
+            ('Pointer',[a for a in DEFAULT_BINDINGS if a.startswith('pointer_')]),
         ):
-            page = ttk.Frame(tabs, padding=12)
-            tabs.add(page, text=title)
-            page.columnconfigure(0, weight=1)
-            for row, action in enumerate(actions):
-                ttk.Label(page, text=ACTION_LABELS[action], wraplength=475).grid(
-                    row=row, column=0, sticky="w", padx=(0, 12), pady=7)
-                choices = MODIFIER_CHOICES if action == "pointer_modifier" else KEY_CHOICES
-                ttk.Combobox(page, values=choices, textvariable=self.fields[action], width=15).grid(
-                    row=row, column=1, sticky="e", pady=7)
-        ttk.Label(self, text="Con trỏ ảo: dùng cho một số game/VN ẩn hoặc ghim chuột.\n"
-                  "Virtual pointer: for some games/VNs that hide or lock the cursor.",
-                  wraplength=680).pack(anchor="w", pady=(10, 6))
-        ttk.Label(self, textvariable=self.status, wraplength=680).pack(anchor="w", pady=(0, 8))
-        buttons = ttk.Frame(self)
-        buttons.pack(fill="x")
-        ttk.Button(buttons, text="Mặc định / Defaults", command=self.restore_defaults).pack(side="left")
-        ttk.Button(buttons, text="Lưu / Save", command=self.save_values).pack(side="left", padx=8)
-        ttk.Button(buttons, text="Thu nhỏ / Minimise", command=parent.iconify).pack(side="right")
+            page=ttk.Frame(tabs,padding=12)
+            tabs.add(page,text=title)
+            page.columnconfigure(0,weight=1)
+            for row,action in enumerate(actions):
+                ttk.Label(page,text=ACTION_LABELS[action],wraplength=430).grid(
+                    row=row,column=0,sticky='w',padx=(0,12),pady=7)
+                button=ttk.Button(page,width=21,command=lambda a=action:self.begin_capture(a))
+                button.grid(row=row,column=1,sticky='e',pady=7)
+                self.buttons[action]=button
+        ttk.Label(self,text='The virtual pointer is for games/VNs that hide or lock the mouse cursor.',
+                  wraplength=680).pack(anchor='w',pady=(10,6))
+        ttk.Label(self,textvariable=self.status,wraplength=680).pack(anchor='w',pady=(0,8))
+        buttons=ttk.Frame(self)
+        buttons.pack(fill='x')
+        ttk.Button(buttons,text='Defaults',command=self.restore_defaults).pack(side='left')
+        ttk.Button(buttons,text='Save',command=self.save_values).pack(side='left',padx=8)
+        ttk.Button(buttons,text='Minimise',command=parent.iconify).pack(side='right')
+        self._refresh_buttons()
+        self.after(25,self._poll_capture)
+
+    def _refresh_buttons(self):
+        for action,button in self.buttons.items():
+            button.configure(text='Press a key...' if action==self.capture_action else display_key(self.fields[action].get()))
+
+    def begin_capture(self,action):
+        if self.capture_action==action:
+            _key_capture.cancel()
+            self.capture_action=None
+            self.status.set('Key capture cancelled.')
+        else:
+            _key_capture.begin(held_keys=_currently_down_keys())
+            self.capture_action=action
+            self.status.set('Press and release one key. Click this button again to cancel.')
+        self._refresh_buttons()
+
+    def process_capture(self):
+        code=_key_capture.poll()
+        if code is None:
+            if self.capture_action is not None and not _key_capture.active:
+                self.capture_action=None
+                self.status.set('Key capture cancelled.')
+                self._refresh_buttons()
+            return
+        action=self.capture_action
+        self.capture_action=None
+        if action is not None:
+            duplicate=next((a for a,v in self.fields.items() if a!=action and normalize_key(v.get())==code),None)
+            if duplicate:
+                self.status.set(f'{display_key(code)} is already assigned to {ACTION_LABELS[duplicate]}. Choose another key.')
+            else:
+                self.fields[action].set(code)
+                self.status.set(f'{ACTION_LABELS[action]}: {display_key(code)}. Click Save to apply.')
+                if code==0x13 and action in ('collect','pointer_modifier'):
+                    self.status.set('Pause: tap once to start, again to stop. Click Save to apply.')
+        self._refresh_buttons()
+
+    def _poll_capture(self):
+        self.process_capture()
+        self.after(25,self._poll_capture)
 
     def save_values(self):
         global KEY_BINDINGS
         from tkinter import messagebox
-        try:
-            bindings = save_bindings(self.config_path, {a: v.get() for a, v in self.fields.items()})
-        except (OSError, ValueError) as error:
-            self.status.set("Chưa lưu / Not saved.")
-            messagebox.showerror("Không lưu được / Cannot save", str(error), parent=self)
+        KeyboardSettings.process_capture(self)
+        if self.capture_action is not None:
+            self.status.set('Finish or cancel key capture before saving.')
             return
-        KEY_BINDINGS = bindings
+        try:
+            bindings=save_bindings(self.config_path,{a:v.get() for a,v in self.fields.items()})
+        except (OSError,ValueError) as error:
+            self.status.set('Not saved.')
+            messagebox.showerror('Cannot save',str(error),parent=self)
+            return
+        KEY_BINDINGS=bindings
         _reset_keyboard_state()
-        for action, key in bindings.items():
+        for action,key in bindings.items():
             self.fields[action].set(key)
-        self.status.set("Đã lưu và áp dụng. Thu nhỏ để dùng / Saved and applied. Minimise to use.")
+        self._refresh_buttons()
+        self.status.set('Saved and applied. Minimise this window to use Hover Dict.')
 
     def restore_defaults(self):
-        for action, key in DEFAULT_BINDINGS.items():
+        _key_capture.cancel()
+        self.capture_action=None
+        for action,key in DEFAULT_BINDINGS.items():
             self.fields[action].set(key)
-        self.status.set("Đã điền mặc định; bấm Lưu để áp dụng / Defaults filled; Save to apply.")
+        self._refresh_buttons()
+        self.status.set('Defaults selected. Click Save to apply.')
 
 
 def _bind_settings_focus(root):
@@ -1726,6 +1805,7 @@ def _bind_settings_focus(root):
         try:
             focused = root.focus_displayof()
             if focused is None or focused.winfo_toplevel() is not root:
+                _key_capture.cancel()
                 _editing_keys.clear()
         except tk.TclError:
             _editing_keys.clear()
@@ -1745,7 +1825,7 @@ def _bind_settings_focus(root):
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Hover Dict v5.3.1 Simple — Scroll + Nhật")
+        self.title("Hover Dict — Controls")
         self.geometry("750x540")
         self.minsize(700, 520)
         KeyboardSettings(self).pack(fill="both", expand=True, padx=16, pady=16)
@@ -1760,7 +1840,7 @@ class App(tk.Tk):
         try:
             self._raw_mouse_input = _RawMouseInput(self.winfo_id())
         except Exception as e:
-            print(f"Raw Input chưa sẵn sàng ({e}); vẫn dùng được các phím di chuyển con trỏ đã đặt.")
+            print(f"Raw Input is unavailable ({e}); the configured pointer movement keys are still available.")
         self._popup_visible = False
         self._highlight_visible = False
         self._pointer_drawn_at = None
@@ -1844,7 +1924,7 @@ class App(tk.Tk):
             # FRAMECHANGED | NOACTIVATE | NOZORDER | NOMOVE | NOSIZE
             self._user32.SetWindowPos(hwnd, None, 0, 0, 0, 0, 0x0037)
             if not self._user32.SetWindowDisplayAffinity(hwnd, 0x11) and DEBUG_OCR:
-                print("[OCR] Windows không exclude được overlay khỏi capture")
+                print("[OCR] Windows could not exclude the overlay from capture.")
             self._overlay_handles[win] = hwnd
         return hwnd
 
@@ -1976,7 +2056,6 @@ class App(tk.Tk):
 DEPENDENCIES = {
     'oneocr': 'oneocr', 'mss': 'mss', 'pynput': 'pynput', 'Pillow': 'PIL',
     'numpy': 'numpy', 'PyAutoGUI': 'pyautogui', 'playwright': 'playwright.sync_api',
-    'SudachiPy': 'sudachipy', 'sudachidict_core': 'sudachidict_core',
 }
 ENGINE_FILES = ('oneocr.dll', 'oneocr.onemodel', 'onnxruntime.dll')
 
@@ -2136,21 +2215,33 @@ def main():
     try:
         KEY_BINDINGS = load_bindings()
     except (OSError, ValueError) as error:
-        print(f'Cấu hình phím bị lỗi ({error}); đang dùng phím mặc định.')
+        print(f'Invalid key configuration ({error}); using default keys.')
+    try:
+        keyboard = importlib.import_module('pynput.keyboard')
+    except (ImportError, OSError) as error:
+        print(f'Keyboard support is unavailable ({error}). Run Check_And_Install.bat first.')
+        return 1
     if args.settings:
         root = tk.Tk()
-        root.title('Hover Dict — Phím / Keybindings')
+        root.title('Hover Dict — Controls')
         root.geometry('750x540')
         root.minsize(700, 520)
         KeyboardSettings(root).pack(fill='both', expand=True, padx=16, pady=16)
-        root.mainloop()
+        _bind_settings_focus(root)
+        listener = _make_keyboard_listener(handle_actions=False)
+        listener.daemon = True
+        listener.start()
+        try:
+            root.mainloop()
+        finally:
+            _key_capture.cancel()
+            listener.stop()
         return 0
     try:
         mss = importlib.import_module('mss')
         np = importlib.import_module('numpy')
-        keyboard = importlib.import_module('pynput.keyboard')
     except (ImportError, OSError) as error:
-        print(f'Thiếu/lỗi thư viện ({error}). Chạy Check_And_Install.bat trước.')
+        print(f'Missing or broken dependency ({error}). Run Check_And_Install.bat first.')
         return 1
     import ctypes
     try:
@@ -2159,28 +2250,28 @@ def main():
         ctypes.windll.user32.SetProcessDPIAware()
 
     print("─" * 60)
-    print(f"  Hover Dict v5.3.1 Simple  —  OneOCR + backend dịch: {TRANSLATE_BACKEND}")
+    print(f"  Hover Dict v5.3.2 Simple  —  OneOCR + translation backend: {TRANSLATE_BACKEND}")
     print("─" * 60)
 
     try:
         import oneocr  # noqa
         print("✅ oneocr import OK")
     except ImportError:
-        print("❌ Thiếu oneocr — chạy: py -3.12 -m pip install oneocr")
+        print("Missing oneocr. Run Check_And_Install.bat.")
         return
 
     try:
         _get_ocr()
     except Exception as e:
-        print(f"❌ Không load được OneOCR engine ({e})")
-        print("   Kiểm tra 3 file oneocr.dll / oneocr.onemodel / onnxruntime.dll")
-        print("   đã đặt đúng C:/Users/<user>/.config/oneocr/ chưa.")
+        print(f"Cannot load the OneOCR engine ({e})")
+        print("   Check oneocr.dll / oneocr.onemodel / onnxruntime.dll")
+        print("   in C:/Users/<user>/.config/oneocr/.")
         return
 
     try:
         import pyautogui  # noqa
     except ImportError:
-        print("❌ Thiếu pyautogui — chạy: py -3.12 -m pip install pyautogui")
+        print("Missing PyAutoGUI. Run Check_And_Install.bat.")
         return
 
     # Start the UI first; browser initialization runs independently of OCR.
@@ -2190,25 +2281,26 @@ def main():
     if TRANSLATE_BACKEND == "deepl_web":
         _deepl_web_ensure_worker_started(wait=False)
     threading.Thread(target=_ocr_loop, daemon=True).start()
-    listener = keyboard.Listener(on_press=_on_key_press, on_release=_on_key_release)
+    listener = _make_keyboard_listener()
     listener.daemon = True
     listener.start()
 
-    print("🚀 Đang chạy.")
-    print("   Rê chuột vào 1 từ  → chỉ hiện khung, KHÔNG tự dịch.")
-    print(f"   {display_key(KEY_BINDINGS['lookup'])} → kiểm tra ảnh mới rồi dịch từ dưới con trỏ.")
-    print("   Chữ vẫn ở chỗ cũ → giữ nghĩa; chữ đổi/di chuyển → tự ẩn.")
-    print(f"   {display_key(KEY_BINDINGS['refresh'])} → ép OCR màn hình mà không dịch.")
-    print(f"   Giữ {display_key(KEY_BINDINGS['collect'])} + rê → gom cụm; thả để dịch.")
-    print(f"   Bản dịch cả cụm ẩn khi rê xa {POPUP_DISMISS_DISTANCE_PX} px hoặc tra tiếp.")
-    print(f"   {display_key(KEY_BINDINGS['toggle_pointer'])} → con trỏ ảo cho game/VN ẩn hoặc ghim chuột.")
-    print(f"   {display_key(KEY_BINDINGS['exit'])} → thoát. Đổi phím trong cửa sổ Hover Dict.\n")
+    print("Hover Dict is running.")
+    print("   Point at a word to highlight it. Press your lookup key to translate.")
+    print(f"   {display_key(KEY_BINDINGS['lookup'])} -> capture fresh pixels and translate the word at the pointer.")
+    print("   Translation stays while its word remains in place; changed or moved text dismisses it.")
+    print(f"   {display_key(KEY_BINDINGS['refresh'])} -> refresh screen OCR without translating.")
+    print(f"   Hold {display_key(KEY_BINDINGS['collect'])} and sweep over words; release to translate the selection.")
+    print(f"   Selection translation closes after moving {POPUP_DISMISS_DISTANCE_PX} px or starting another lookup.")
+    print(f"   {display_key(KEY_BINDINGS['toggle_pointer'])} -> virtual pointer for games/VNs that hide or lock the cursor.")
+    print(f"   {display_key(KEY_BINDINGS['exit'])} -> exit. Change keys in the Hover Dict window.\n")
 
     try:
         app.mainloop()
     finally:
         _exit_requested.set()
         _ocr_wakeup.set()
+        _key_capture.cancel()
         listener.stop()
         if app._raw_mouse_input is not None:
             app._raw_mouse_input.close()

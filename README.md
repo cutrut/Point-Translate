@@ -64,18 +64,28 @@ connects to the existing Chrome browser.
 
 ## Change the keys
 
-The main Hover Dict window has **Actions** and **Pointer** tabs. Choose/type
-keys, click **Save**, then minimise the window or return to your game. Saved
-keys apply immediately. **Defaults** fills in the original keys; click **Save**
-to apply the reset.
+1. In the Hover Dict **Controls** window, open **Actions** or **Pointer**.
+2. Click the button showing the current key next to an action.
+3. Press and release the keyboard key you want. The button shows the captured
+   key. Click the same button again, or leave the window, to cancel capture.
+4. Click **Save**, then **Minimise** or return to your game. Changes apply immediately.
 
-Actions accept one key: `0`–`9`, `a`–`z`, `F1`–`F12`, or a listed named key.
-The pointer nudge modifier is configured separately. Action chords such as
-`Ctrl+2` are not supported. Duplicate or invalid bindings are rejected.
-Global action keys pause while the settings window has focus. Closing the
-main window with **X** exits the app; minimise it to keep reading.
+The buttons accept the keys Windows exposes, including punctuation, modifiers
+such as Ctrl/Alt/Shift/Win, numpad keys, F1–F24, Print Screen and media keys.
+There is no key-name box or fixed list to type into. Each action uses one key;
+shortcut chords such as `Ctrl+2` are not assigned as a single binding.
+Duplicate assignments are rejected. **Defaults** selects the original keys;
+click **Save** to apply them. Existing saved bindings are loaded automatically.
 
-To edit keys without starting OCR, open CMD as above and run:
+If you bind a modifier to an action, pressing it as part of another shortcut
+also triggers that action. Normal action keys still reach Windows/the game. **Pause** is a tap-only key: for word collection or
+the pointer hold action, tap once to start and again to stop. Hardware-only
+keys such as Fn, and Windows-reserved combinations, may not be available to
+applications; see [Windows key limits](https://learn.microsoft.com/en-us/windows/powertoys/keyboard-manager).
+
+Action hotkeys pause while the Controls window has focus. Closing its **X**
+exits the app; **Minimise** keeps it running. To edit keys without starting OCR,
+open CMD in the app folder and run:
 
 ```bat
 Start_Hover_Dict.bat settings
@@ -91,7 +101,6 @@ Start_Hover_Dict.bat settings
 | `3` | Force a full-screen OCR refresh |
 | `F8` | Toggle the virtual pointer for some games/VNs that hide or lock the cursor |
 | Left `Alt` + arrows | Nudge the virtual pointer |
-| `F9` | Experimental Japanese segmentation, outside supported scope |
 | `Esc` | Exit while using the game/reading application |
 
 The **virtual pointer** draws a separate lookup crosshair when a game or VN
@@ -118,9 +127,9 @@ The app generates `keybindings.json` when saving keys, `hover_dict_cache.db`
 for translations and `BotChromeProfile/` for its dedicated Chrome session.
 These do not need to be downloaded or created manually. OCR is local; selected
 text is sent to DeepL. Advanced OCR/backend options remain near the top of the
-Python source. Japanese code is experimental; supported reading remains Latin only.
+Python source. Supported reading remains Latin only.
 
-**5.3.1 Simple** is based on the two working files supplied by the user.
+**5.3.2 Simple** is based on the two working files supplied by the user.
 Automated checks cover logic. Native installation, GUI and game hooks still
 need Windows testing. To publish on GitHub, upload the extracted files at the
 repository root so README appears on its landing page; do not upload only the ZIP.

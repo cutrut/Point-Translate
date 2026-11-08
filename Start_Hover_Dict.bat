@@ -7,15 +7,15 @@ pushd "%~dp0" || goto folder_error
 set "HD_APP=hover_dict_v5_1_LN_fix.py"
 
 if not exist "%HD_APP%" (
-    echo [LOI] Khong tim thay %HD_APP%.
-    echo Dat file .bat cung thu muc voi file .py, roi bam dup lai.
+    echo [ERROR] Cannot find %HD_APP%.
+    echo Keep the BAT and Python file in the same folder, then try again.
     goto failed
 )
 
 call :find_python
 if not defined HD_PY (
-    echo [LOI] Khong tim thay Python 3.12 x64 kem Tkinter.
-    echo Chay Check_And_Install.bat truoc.
+    echo [ERROR] Cannot find Python 3.12 x64 with Tkinter.
+    echo Run Check_And_Install.bat first.
     goto failed
 )
 
@@ -36,18 +36,18 @@ if not defined HD_CHROME if exist "%ProgramFiles(x86)%\Google\Chrome\Application
 if not defined HD_CHROME if exist "%LocalAppData%\Google\Chrome\Application\chrome.exe" set "HD_CHROME=%LocalAppData%\Google\Chrome\Application\chrome.exe"
 if not defined HD_CHROME for /f "delims=" %%G in ('where chrome.exe 2^>nul') do if not defined HD_CHROME set "HD_CHROME=%%G"
 if not defined HD_CHROME (
-    echo [CANH BAO] Khong tim thay Chrome. Hover Dict van se duoc mo.
+    echo [WARNING] Chrome was not found. Starting Hover Dict anyway.
     goto run
 )
 
-echo Dang mo Chrome rieng cho DeepL Web...
+echo Opening the dedicated DeepL Chrome window...
 start "" "%HD_CHROME%" --remote-debugging-port=9222 --user-data-dir="%CD%\BotChromeProfile" "https://www.deepl.com/en/translator"
 for /l %%I in (1,1,12) do (
     call :cdp_ready
     if not errorlevel 1 goto run
     timeout /t 1 /nobreak >nul
 )
-echo [CANH BAO] Chrome chua san sang o cong 9222. Hover Dict van se duoc mo.
+echo [WARNING] Chrome is not ready on port 9222. Starting Hover Dict anyway.
 
 :run
 "%HD_PY%" "%HD_APP%"
@@ -61,7 +61,7 @@ set "HD_EXIT=%errorlevel%"
 :finished
 popd
 echo.
-echo Hover Dict da thoat. Neu co loi, xem thong bao o tren.
+echo Hover Dict has exited. Check the messages above for errors.
 pause
 exit /b %HD_EXIT%
 
@@ -71,7 +71,7 @@ pause
 exit /b 1
 
 :folder_error
-echo [LOI] Khong mo duoc thu muc chua launcher.
+echo [ERROR] Cannot open the launcher folder.
 pause
 exit /b 1
 

@@ -63,18 +63,29 @@ app kết nối vào Chrome đang mở.
 
 ## Đổi phím ngay trong app
 
-Cửa sổ Hover Dict có hai tab **Thao tác / Actions** và **Di chuyển con trỏ /
-Pointer**. Chọn hoặc gõ phím → **Lưu / Save** → thu nhỏ cửa sổ hoặc quay về game.
-Phím mới có hiệu lực ngay, không cần khởi động lại. Nút **Mặc định / Defaults**
-điền lại phím cũ; bấm **Lưu** để áp dụng.
+Giao diện app và các thông báo dùng **tiếng Anh**.
 
-Mỗi thao tác nhận một phím đơn: `0`–`9`, `a`–`z`, `F1`–`F12` hoặc phím có
-trong danh sách. Phím giữ khi chỉnh con trỏ được đặt riêng. Chưa hỗ trợ gán
-tổ hợp như `Ctrl+2` cho thao tác dịch; phím trùng hoặc không hợp lệ sẽ bị từ chối.
-Khi đang thao tác trong cửa sổ cài phím, phím tắt dịch được tạm ngưng.
-Đóng cửa sổ chính bằng dấu **X** sẽ thoát app; muốn tiếp tục dùng thì **thu nhỏ**.
+1. Trong cửa sổ **Controls**, mở tab **Actions** hoặc **Pointer**.
+2. Bấm nút đang hiện phím hiện tại cạnh thao tác muốn đổi.
+3. Nhấn rồi thả phím muốn gán. Nút sẽ hiện phím vừa nhận. Bấm lại nút đó hoặc
+   chuyển sang cửa sổ khác để hủy việc chọn phím.
+4. Bấm **Save**, rồi **Minimise** hoặc quay về game. Phím mới có hiệu lực ngay.
 
-Chỉ muốn chỉnh phím mà chưa chạy OCR: mở CMD như trên rồi nhập:
+Có thể gán các phím Windows nhận được: dấu câu, Ctrl/Alt/Shift/Win, numpad,
+F1–F24, Print Screen, phím media… Không cần gõ tên phím hoặc chọn trong danh sách.
+Mỗi thao tác dùng một phím đơn, chưa gán cả tổ hợp như `Ctrl+2` thành một binding.
+Phím trùng bị từ chối. Nút **Defaults** chọn lại phím mặc định; bấm **Save** để
+áp dụng. App tự đọc lại cấu hình đã lưu từ bản trước.
+
+Nếu gán một phím bổ trợ cho thao tác, thao tác đó cũng chạy khi nhấn phím ấy
+trong một tổ hợp khác. Các phím thao tác vẫn được Windows/game nhận đồng thời. **Pause** chỉ gửi tín hiệu bấm: khi gán cho gom từ hoặc
+phím giữ di chuyển con trỏ, bấm một lần để bắt đầu và bấm lần nữa để dừng.
+Phím chỉ hoạt động trong phần cứng như Fn và các tổ hợp hệ thống dành riêng
+có thể không được Windows gửi tới app; xem [giới hạn phím Windows](https://learn.microsoft.com/en-us/windows/powertoys/keyboard-manager).
+
+Khi cửa sổ **Controls** đang được chọn, phím tắt dịch tạm ngưng. Đóng bằng dấu
+**X** sẽ thoát app; muốn tiếp tục dùng thì bấm **Minimise**. Chỉ muốn chỉnh phím
+mà chưa chạy OCR: mở CMD như trên rồi nhập:
 
 ```bat
 Start_Hover_Dict.bat settings
@@ -90,7 +101,6 @@ Start_Hover_Dict.bat settings
 | `3` | Quét OCR lại toàn màn hình |
 | `F8` | Hiện/ẩn con trỏ ảo cho một số game hoặc VN ẩn/ghim chuột |
 | `Alt` trái + mũi tên | Chỉnh vị trí con trỏ ảo từng bước |
-| `F9` | Tách từ Nhật thử nghiệm, ngoài phạm vi hỗ trợ |
 | `Esc` | Thoát app khi đang ở game/ứng dụng đọc |
 
 **Con trỏ ảo** là dấu ngắm riêng để chỉ vào chữ khi game/VN ẩn con trỏ thật
@@ -114,9 +124,9 @@ hoạt động được; lưu ý về HOI4 ở trên vẫn áp dụng.
 App tự tạo `keybindings.json` khi lưu phím, `hover_dict_cache.db` khi dùng cache
 và `BotChromeProfile/` khi mở Chrome riêng; không cần tải hay tạo chúng thủ công.
 OCR chạy local, nội dung được chọn gửi tới DeepL. Cấu hình OCR/backend nâng cao
-nằm đầu file Python. Phần Nhật vẫn là thử nghiệm; phạm vi hỗ trợ chỉ gồm chữ Latin.
+nằm đầu file Python. Phạm vi hỗ trợ chỉ gồm chữ Latin.
 
-Bản **5.3.1 Simple** dựa trên hai file đang chạy do người dùng cung cấp.
+Bản **5.3.2 Simple** dựa trên hai file đang chạy do người dùng cung cấp.
 Kiểm tra tự động xác minh logic; cài đặt, giao diện và hook/game thực tế vẫn
 cần kiểm tra trực tiếp trên Windows. Khi đăng GitHub, tải các file đã giải nén
 lên thư mục gốc để README hiện trên trang repo; không chỉ tải mỗi ZIP.
