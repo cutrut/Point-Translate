@@ -4,7 +4,7 @@ title Hover Dict Launcher
 set "PYTHONUTF8=1"
 
 pushd "%~dp0" || goto folder_error
-set "HD_APP=hover_dict_v5_1_LN_fix.py"
+set "HD_APP=hover_dict.py"
 
 if not exist "%HD_APP%" (
     echo [ERROR] Cannot find %HD_APP%.

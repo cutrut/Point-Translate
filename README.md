@@ -9,15 +9,19 @@ including **Hearts of Iron IV (HOI4)**, currently do not work with this tool.
 
 [Tiếng Việt](README.vi.md)
 
+**Version: 5.3.3 Simple** · [Changes](CHANGELOG.md) · [Testing](TESTING.md) · [MIT License](LICENSE)
+
 ## Files
 
 | File | Purpose |
 | --- | --- |
 | `Start_Hover_Dict.bat` | Open the dedicated DeepL Chrome window and run the app |
-| `hover_dict_v5_1_LN_fix.py` | The complete app, including its key settings window |
+| `hover_dict.py` | The complete app, including its key settings window |
 | `Check_And_Install.bat` | Check requirements and install missing components |
 | `requirements.txt` | Python package list for manual CMD installation |
 | `README.md`, `README.vi.md` | English and Vietnamese instructions |
+| `CHANGELOG.md`, `TESTING.md` | Release notes and Windows test checklist |
+| `LICENSE` | MIT license for Hover Dict |
 
 Keep the three runnable files together and retain the filenames in the ZIP.
 
@@ -40,6 +44,11 @@ Keep the three runnable files together and retain the filenames in the ZIP.
 
 For later launches, use `Start_Hover_Dict.bat`. Run the checker again if an
 installation or import error appears.
+
+**Upgrading from 5.3.2:** the app file is now `hover_dict.py`. Replace both BAT
+files and the Python file together. Existing `keybindings.json`,
+`hover_dict_cache.db` and `BotChromeProfile/` remain in the same folder and
+are reused. The previous Python filename is no longer used by the launchers.
 
 ## CMD instructions
 
@@ -129,7 +138,19 @@ These do not need to be downloaded or created manually. OCR is local; selected
 text is sent to DeepL. Advanced OCR/backend options remain near the top of the
 Python source. Supported reading remains Latin only.
 
-**5.3.2 Simple** is based on the two working files supplied by the user.
-Automated checks cover logic. Native installation, GUI and game hooks still
-need Windows testing. To publish on GitHub, upload the extracted files at the
-repository root so README appears on its landing page; do not upload only the ZIP.
+## Validation status
+
+This release has automated checks for Python syntax, command-line help,
+unsupported-platform errors, key capture/binding persistence and setup helper
+logic. Launcher filenames and archive contents are also checked. These checks
+do not validate Windows installation, the native OCR engine, keyboard hooks,
+Chrome/DeepL or in-game overlays. Native Windows testing is **pending**; use
+[TESTING.md](TESTING.md) to record results before claiming compatibility.
+
+## License and dependencies
+
+Hover Dict's source and documentation are licensed under the
+[MIT License](LICENSE), copyright (c) 2026 cutrut. External Python packages,
+Chrome, Microsoft Snipping Tool/OneOCR engine files and DeepL remain subject
+to their respective licenses and terms. No OCR engine binaries are bundled;
+see the [OneOCR instructions](https://github.com/AuroraWright/oneocr).

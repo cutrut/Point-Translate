@@ -8,15 +8,19 @@ DeepL cho game, visual novel hoặc ứng dụng không cho chọn chữ.
 
 [English](README.md)
 
+**Phiên bản: 5.3.3 Simple** · [Thay đổi](CHANGELOG.md) · [Kiểm thử](TESTING.md) · [MIT License](LICENSE)
+
 ## Có những file nào?
 
 | File | Dùng làm gì? |
 | --- | --- |
 | `Start_Hover_Dict.bat` | Bấm đúp để mở Chrome DeepL và chạy app |
-| `hover_dict_v5_1_LN_fix.py` | Toàn bộ app, gồm cả cửa sổ đổi phím |
+| `hover_dict.py` | Toàn bộ app, gồm cả cửa sổ đổi phím |
 | `Check_And_Install.bat` | Kiểm tra và cài những thứ còn thiếu |
 | `requirements.txt` | Danh sách thư viện Python, dùng khi muốn cài bằng CMD |
 | `README.md`, `README.vi.md` | Hướng dẫn tiếng Anh và tiếng Việt |
+| `CHANGELOG.md`, `TESTING.md` | Thay đổi của bản mới và checklist kiểm thử Windows |
+| `LICENSE` | Giấy phép MIT cho Hover Dict |
 
 Đặt ba file chạy cùng thư mục. Giữ nguyên tên file trong ZIP.
 
@@ -39,6 +43,11 @@ DeepL cho game, visual novel hoặc ứng dụng không cho chọn chữ.
 
 Những lần sau chỉ cần chạy `Start_Hover_Dict.bat`. Nếu báo thiếu thư viện,
 chạy lại `Check_And_Install.bat`.
+
+**Nâng cấp từ 5.3.2:** file app đã đổi thành `hover_dict.py`. Thay đồng thời
+hai file BAT và file Python. Giữ lại `keybindings.json`, `hover_dict_cache.db`
+và `BotChromeProfile/` trong cùng thư mục để tiếp tục dùng cấu hình và dữ liệu
+cũ. Hai file BAT mới không còn gọi file Python tên cũ.
 
 ## Muốn nhập lệnh trong CMD
 
@@ -126,7 +135,19 @@ và `BotChromeProfile/` khi mở Chrome riêng; không cần tải hay tạo ch�
 OCR chạy local, nội dung được chọn gửi tới DeepL. Cấu hình OCR/backend nâng cao
 nằm đầu file Python. Phạm vi hỗ trợ chỉ gồm chữ Latin.
 
-Bản **5.3.2 Simple** dựa trên hai file đang chạy do người dùng cung cấp.
-Kiểm tra tự động xác minh logic; cài đặt, giao diện và hook/game thực tế vẫn
-cần kiểm tra trực tiếp trên Windows. Khi đăng GitHub, tải các file đã giải nén
-lên thư mục gốc để README hiện trên trang repo; không chỉ tải mỗi ZIP.
+## Tình trạng kiểm thử
+
+Bản này có kiểm tra tự động cho cú pháp Python, trợ giúp dòng lệnh, thông báo
+trên hệ điều hành không được hỗ trợ, nhận/lưu phím và logic hỗ trợ cài đặt.
+Tên file mà launcher gọi và nội dung ZIP cũng được kiểm tra. Các bước đó chưa
+xác minh cài đặt Windows, engine OCR thật, hook bàn phím, Chrome/DeepL hay
+overlay trong game. Kiểm thử Windows thực tế **chưa hoàn tất**; dùng
+[TESTING.md](TESTING.md) để ghi kết quả trước khi công bố khả năng tương thích.
+
+## Giấy phép và thành phần bên ngoài
+
+Mã nguồn và tài liệu Hover Dict dùng [giấy phép MIT](LICENSE), copyright (c)
+2026 cutrut. Các thư viện Python, Chrome, file engine Microsoft Snipping
+Tool/OneOCR và DeepL tuân theo giấy phép, điều khoản riêng của từng bên.
+Bản phát hành không kèm file nhị phân engine OCR; xem
+[hướng dẫn OneOCR](https://github.com/AuroraWright/oneocr).

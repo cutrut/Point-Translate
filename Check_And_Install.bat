@@ -3,8 +3,8 @@ setlocal EnableExtensions DisableDelayedExpansion
 title Hover Dict - Check and Install
 set "PYTHONUTF8=1"
 pushd "%~dp0" || goto folder_error
-if not exist "hover_dict_v5_1_LN_fix.py" (
-    echo [ERROR] Put this BAT beside hover_dict_v5_1_LN_fix.py.
+if not exist "hover_dict.py" (
+    echo [ERROR] Put this BAT beside hover_dict.py.
     goto failed
 )
 call :find_python
@@ -25,7 +25,7 @@ if not defined HD_PY (
     goto failed
 )
 :check
-"%HD_PY%" "hover_dict_v5_1_LN_fix.py" --setup
+"%HD_PY%" "hover_dict.py" --setup
 set "HD_EXIT=%errorlevel%"
 popd
 echo.
