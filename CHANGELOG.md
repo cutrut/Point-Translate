@@ -1,5 +1,12 @@
 # Changelog
 
+## Point & Translate — 2026-11-09
+
+- Renamed the app to Point & Translate. Run `Start_Point_And_Translate.bat`
+  to launch `point_and_translate.py`.
+- Updated both READMEs to explain how to look up unfamiliar words while
+  learning a language through games and visual novels.
+
 ## 5.3.3 Simple — 2026-11-08
 
 - Renamed the application to `hover_dict.py` so the filename does not carry an

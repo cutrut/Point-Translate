@@ -1,4 +1,4 @@
-# Testing Hover Dict 5.3.3 Simple
+# Testing Point & Translate 5.3.3 Simple
 
 **Native Windows status: not yet tested for this release.** Check a box only
 after observing the expected result. A setup `[READY]` message verifies local
@@ -13,14 +13,14 @@ incomplete OCR engine file copies. Both BAT filenames, their line endings,
 README links and the final ZIP manifest are checked separately.
 
 These are logic and packaging checks, not native Windows integration tests.
-Preparation result on 2026-11-08: **15/15 checks passed** using Python 3.12.14
-on Linux. Native Windows results remain unrecorded.
+The original 5.3.3 build passed **15/15 checks** on 2026-11-08 using
+Python 3.12.14 on Linux. Native Windows results remain unrecorded.
 
 To repeat the basic syntax/help checks on Windows, run separately in CMD:
 
 ```bat
-py -3.12 -m py_compile hover_dict.py
-py -3.12 hover_dict.py --help
+py -3.12 -m py_compile point_and_translate.py
+py -3.12 point_and_translate.py --help
 ```
 
 ## Record the test environment
@@ -41,18 +41,19 @@ py -3.12 hover_dict.py --help
   Python packages import, Chrome exists and OneOCR actually loads.
 - [ ] Repeat the checker after a successful install. Working packages are
   retained, the engine loads again and the result remains `[READY]`.
-- [ ] Repeat with a folder path containing spaces and Vietnamese characters.
-  Both BAT files locate and run `hover_dict.py` from that folder.
+- [ ] Repeat with a folder path containing spaces, Vietnamese characters
+  and an ampersand. Both BAT files locate and run `point_and_translate.py`
+  from that folder.
 - [ ] If Python, WinGet, Chrome or the matching OneOCR files cannot be
   installed, confirm a useful error is shown and the checker does not claim
   `[READY]`. Record which missing-component case was tested.
-- [ ] Upgrade an existing 5.3.2 folder with both new BAT files and
-  `hover_dict.py`. Existing saved keys, translation cache and Chrome session
-  are reused. Test upgrades with saved numeric and legacy named key bindings.
+- [ ] Upgrade an existing Hover Dict folder as described in [README.md](README.md).
+  Confirm the app reuses saved keys, the translation cache and the Chrome session.
+  Test upgrades with saved numeric and legacy named key bindings.
 
 ## Controls and OCR
 
-- [ ] `Start_Hover_Dict.bat settings` opens the English Controls window
+- [ ] `Start_Point_And_Translate.bat settings` opens the English Controls window
   without starting OCR or opening Chrome.
 - [ ] Click a binding button, press and release a key, then Save. The binding
   works after returning to the reading app and survives a restart.

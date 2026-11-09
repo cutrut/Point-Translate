@@ -1,156 +1,101 @@
-# Hover Dict — simple edition
+# Point & Translate
 
-Point at text on your screen, press a key, and read its translation beside it.
-A Windows OCR overlay using OneOCR and DeepL for games, visual novels and
-applications whose text cannot be selected.
+Point at a word and press `2`. The translation pops up next to it.
 
-**Supported text: Latin-alphabet text only, such as English.** Some games,
-including **Hearts of Iron IV (HOI4)**, currently do not work with this tool.
+Use it to look up words while playing games or reading visual novels in a
+language you're learning. It reads text off the screen, even in menus and
+dialogue boxes where you can't copy it. It's free, runs on Windows, and
+reads **Latin-script text** like English.
 
 [Tiếng Việt](README.vi.md)
 
-**Version: 5.3.3 Simple** · [Changes](CHANGELOG.md) · [Testing](TESTING.md) · [MIT License](LICENSE)
+## Get it running
 
-## Files
+1. Unzip it into a folder you can write to. Keep `point_and_translate.py`
+   and the two BAT files together.
+2. Run `Check_And_Install.bat`. It checks for **Python 3.12 x64**, Python
+   packages, Chrome and the OneOCR engine. It tries to install what's missing.
+   Wait for `[READY]`.
+3. Run `Start_Point_And_Translate.bat`. In the Chrome window for DeepL, pick
+   your source and target languages, complete any verification yourself, and
+   try a short sentence. Leave that Chrome window open.
+4. Minimise **Controls**, go back to the game or app, and try `2` on a word.
 
-| File | Purpose |
-| --- | --- |
-| `Start_Hover_Dict.bat` | Open the dedicated DeepL Chrome window and run the app |
-| `hover_dict.py` | The complete app, including its key settings window |
-| `Check_And_Install.bat` | Check requirements and install missing components |
-| `requirements.txt` | Python package list for manual CMD installation |
-| `README.md`, `README.vi.md` | English and Vietnamese instructions |
-| `CHANGELOG.md`, `TESTING.md` | Release notes and Windows test checklist |
-| `LICENSE` | MIT license for Hover Dict |
+Next time, just run `Start_Point_And_Translate.bat`.
 
-Keep the three runnable files together and retain the filenames in the ZIP.
+If you already use Hover Dict, unzip into the old app folder and replace
+`Check_And_Install.bat` when asked. Start it with the new launcher to pick up
+your saved keys, translation cache and Chrome session.
 
-## Install and run
+### From CMD
 
-1. Extract into a writable folder. The app requires **Windows and Python 3.12 x64**.
-2. Run **`Check_And_Install.bat`**. It checks the same Python used by the launcher
-   and installs packages whose imports fail. Existing working packages are
-   retained; no `.venv` is required.
-3. Missing Python or Chrome: the checker tries WinGet. Missing OneOCR engine
-   files: it tries copying a matching set from the installed Snipping Tool,
-   then installing/updating Snipping Tool through Microsoft Store. If a step
-   cannot finish, it names the missing component; resolve it and run the check again.
-4. After **`[READY]`**, double-click **`Start_Hover_Dict.bat`**.
-5. Open DeepL in the dedicated Chrome window. **Manually complete any CAPTCHA
-   or verification prompt**, select the correct **source and target languages**,
-   test a short sentence and keep this Chrome window open.
-6. Minimise the Hover Dict window or return to your game/reading application,
-   point at text, and press the lookup key (`2` by default).
-
-For later launches, use `Start_Hover_Dict.bat`. Run the checker again if an
-installation or import error appears.
-
-**Upgrading from 5.3.2:** the app file is now `hover_dict.py`. Replace both BAT
-files and the Python file together. Existing `keybindings.json`,
-`hover_dict_cache.db` and `BotChromeProfile/` remain in the same folder and
-are reused. The previous Python filename is no longer used by the launchers.
-
-## CMD instructions
-
-Open the app folder in **File Explorer**, click the address bar, type `cmd`,
-and press **Enter**. Enter each command below separately and press **Enter**:
+Open the app folder in File Explorer, type `cmd` in the address bar, and
+press Enter. Run these one at a time, waiting for `[READY]` after the first:
 
 ```bat
 Check_And_Install.bat
-Start_Hover_Dict.bat
+Start_Point_And_Translate.bat
 ```
 
-Wait for the checker to finish with `[READY]` before starting the app.
-To install Python packages manually after installing Python 3.12:
+To install the Python packages by hand, run
+`py -3.12 -m pip install --user -r requirements.txt`. The checker handles
+Chrome and the OneOCR engine separately.
 
-```bat
-py -3.12 -m pip install --user -r requirements.txt
-```
+## Keys
 
-Pip installs Python packages. The checker separately handles Chrome and the
-three OneOCR engine files. `playwright install` is unnecessary because the app
-connects to the existing Chrome browser.
-
-## Change the keys
-
-1. In the Hover Dict **Controls** window, open **Actions** or **Pointer**.
-2. Click the button showing the current key next to an action.
-3. Press and release the keyboard key you want. The button shows the captured
-   key. Click the same button again, or leave the window, to cancel capture.
-4. Click **Save**, then **Minimise** or return to your game. Changes apply immediately.
-
-The buttons accept the keys Windows exposes, including punctuation, modifiers
-such as Ctrl/Alt/Shift/Win, numpad keys, F1–F24, Print Screen and media keys.
-There is no key-name box or fixed list to type into. Each action uses one key;
-shortcut chords such as `Ctrl+2` are not assigned as a single binding.
-Duplicate assignments are rejected. **Defaults** selects the original keys;
-click **Save** to apply them. Existing saved bindings are loaded automatically.
-
-If you bind a modifier to an action, pressing it as part of another shortcut
-also triggers that action. Normal action keys still reach Windows/the game. **Pause** is a tap-only key: for word collection or
-the pointer hold action, tap once to start and again to stop. Hardware-only
-keys such as Fn, and Windows-reserved combinations, may not be available to
-applications; see [Windows key limits](https://learn.microsoft.com/en-us/windows/powertoys/keyboard-manager).
-
-Action hotkeys pause while the Controls window has focus. Closing its **X**
-exits the app; **Minimise** keeps it running. To edit keys without starting OCR,
-open CMD in the app folder and run:
-
-```bat
-Start_Hover_Dict.bat settings
-```
-
-## Default controls
-
-| Input | Action |
+| Key | What it does |
 | --- | --- |
-| Move the pointer over text | Highlight the current word without translating |
-| `2` | Capture fresh pixels and translate the word at the pointer |
-| Hold `1`, sweep over words, release | Collect and translate a selection |
-| `3` | Force a full-screen OCR refresh |
-| `F8` | Toggle the virtual pointer for some games/VNs that hide or lock the cursor |
-| Left `Alt` + arrows | Nudge the virtual pointer |
-| `Esc` | Exit while using the game/reading application |
+| Point at a word | Highlight it |
+| `2` | Read and translate the word at the pointer |
+| Hold `1`, sweep over words, then release | Translate the words you picked |
+| `3` | Scan the screen again |
+| `F8` | Toggle a separate pointer if the game hides or locks the mouse |
+| Left `Alt` + arrows | Nudge the separate pointer |
+| `Esc` | Close Point & Translate |
 
-The **virtual pointer** draws a separate lookup crosshair when a game or VN
-hides the normal mouse or keeps it at the screen centre. Move the mouse or use
-the configured nudge keys to position it over text. It does not unlock the
-game's cursor or pause its camera. Compatibility varies; the HOI4 limitation
-still applies.
+The separate pointer moves with your mouse. The game keeps control of its
+own cursor and camera.
 
-## Missing components and troubleshooting
+To change a key, open **Actions** or **Pointer** in **Controls**. Click the
+current key, press and release the new one, then hit **Save**. Click the
+same button or switch windows to cancel. **Defaults** followed by **Save**
+brings back the original keys.
 
-- Without WinGet, install [Python 3.12 x64](https://www.python.org/downloads/windows/)
-  with **Python Launcher** and **Tcl/Tk**, plus [Chrome](https://www.google.com/chrome/),
-  then rerun the checker.
-- If the engine files cannot be copied automatically, follow the
-  [OneOCR instructions](https://github.com/AuroraWright/oneocr). Place a matching
-  x64 set of `oneocr.dll`, `oneocr.onemodel` and `onnxruntime.dll` in
-  `%USERPROFILE%\.config\oneocr\`, then rerun the checker.
-- Missing overlay in a game: try **Borderless Windowed**. Some games remain incompatible.
-- No translation: read the CMD error and check DeepL verification and languages.
-- After changing languages or translation backend, close the app and remove
-  `hover_dict_cache.db`; cache entries currently depend only on source text.
+Each action takes one key, and each key can only be assigned once. The game
+still gets your keypresses. If you bind a modifier like Ctrl, the action
+also fires when you use Ctrl in a shortcut. For a hold action bound to
+`Pause`, tap once to start and once to stop. [Windows key limits](https://learn.microsoft.com/en-us/windows/powertoys/keyboard-manager)
 
-The app generates `keybindings.json` when saving keys, `hover_dict_cache.db`
-for translations and `BotChromeProfile/` for its dedicated Chrome session.
-These do not need to be downloaded or created manually. OCR is local; selected
-text is sent to DeepL. Advanced OCR/backend options remain near the top of the
-Python source. Supported reading remains Latin only.
+Hotkeys pause while **Controls** has focus. **Minimise** keeps the app running,
+and **X** closes it. To open just the settings, run
+`Start_Point_And_Translate.bat settings` in CMD.
 
-## Validation status
+## If it gets stuck
 
-This release has automated checks for Python syntax, command-line help,
-unsupported-platform errors, key capture/binding persistence and setup helper
-logic. Launcher filenames and archive contents are also checked. These checks
-do not validate Windows installation, the native OCR engine, keyboard hooks,
-Chrome/DeepL or in-game overlays. Native Windows testing is **pending**; use
-[TESTING.md](TESTING.md) to record results before claiming compatibility.
+- **Setup stopped.** Read the error in CMD. If WinGet is missing, install
+  Python 3.12 x64 with Python Launcher and Tcl/Tk, plus Chrome. Then run the
+  checker again. [Python](https://www.python.org/downloads/windows/) · [Chrome](https://www.google.com/chrome/)
+- **OneOCR files are missing.** The checker tries to get them from Snipping
+  Tool or install/update it through Microsoft Store. For manual setup, put
+  a matching x64 set of `oneocr.dll`, `oneocr.onemodel` and `onnxruntime.dll`
+  in `%USERPROFILE%\.config\oneocr\`, then rerun the checker. [OneOCR setup](https://github.com/AuroraWright/oneocr)
+- **DeepL is stuck.** Check the Chrome window for verification, double-check
+  the languages, and read any error in CMD.
+- **Overlay missing in a game.** Try **Borderless Windowed**.
+  **Hearts of Iron IV (HOI4)** is a known incompatibility.
+- **Changed languages or translation backend.** Close the app and delete
+  `hover_dict_cache.db`. The cache uses the original text to find translations.
 
-## License and dependencies
+## What it saves
 
-Hover Dict's source and documentation are licensed under the
-[MIT License](LICENSE), copyright (c) 2026 cutrut. External Python packages,
-Chrome, Microsoft Snipping Tool/OneOCR engine files and DeepL remain subject
-to their respective licenses and terms. No OCR engine binaries are bundled;
-see the [OneOCR instructions](https://github.com/AuroraWright/oneocr).
+OneOCR reads the screen locally. The text you look up goes to DeepL.
+`keybindings.json` holds your keys, `hover_dict_cache.db` holds translations,
+and `BotChromeProfile/` holds the app's separate Chrome session.
+OCR and translation settings are near the top of `point_and_translate.py`.
+
+---
+
+Source and docs are MIT licensed. Third-party components have their own terms.
+Native Windows and game testing are still pending. [Test checklist](TESTING.md)
+
+5.3.3 Simple · [Changes](CHANGELOG.md) · [MIT License](LICENSE)
