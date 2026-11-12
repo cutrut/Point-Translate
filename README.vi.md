@@ -4,9 +4,20 @@ Gặp từ lạ thì rê chuột vào từ đó, bấm `2`. Bản dịch hiện 
 
 Dùng để tra từ lúc chơi game hay đọc visual novel bằng tiếng đang học. App
 đọc chữ trên màn hình, kể cả menu hay hộp thoại không bôi đen được. Miễn phí,
-chạy trên Windows và đọc **chữ Latin** như tiếng Anh.
+chạy trên Windows.
 
 [English](README.md)
+
+## Ngôn ngữ phù hợp
+
+Với chữ OneOCR đọc được, app tra từng từ tốt nhất ở các ngôn ngữ dùng
+dấu cách để tách từ và ít có từ ghép viết rời. App dùng ranh giới từ do
+OCR nhận diện. Khi OCR chỉ trả về cả dòng, app tách chữ theo dấu cách.
+
+- **Tiếng Nhật** thường viết liền các từ, nên app khó khoanh chính xác từng
+  từ để tra.
+- **Tiếng Việt** dùng dấu cách giữa các tiếng, kể cả trong nhiều từ ghép.
+  Khi rê chuột vào `học sinh`, app có thể chỉ khoanh `học` hoặc `sinh`.
 
 ## Cài rồi chạy
 

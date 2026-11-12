@@ -4,10 +4,21 @@ Point at a word and press `2`. The translation pops up next to it.
 
 Use it to look up words while playing games or reading visual novels in a
 language you're learning. It reads text off the screen, even in menus and
-dialogue boxes where you can't copy it. It's free, runs on Windows, and
-reads **Latin-script text** like English.
+dialogue boxes where you can't copy it. It's free and runs on Windows.
 
 [Tiếng Việt](README.vi.md)
+
+## Language support
+
+For text OneOCR can read, word lookup works best in languages that use
+spaces between words and rarely write compounds with spaces. The app uses
+word boundaries detected by OCR. When OCR only provides a line of text,
+the app splits it at spaces.
+
+- **Japanese** usually has no spaces between words, so the app has trouble
+  picking out individual words.
+- **Vietnamese** uses spaces between syllables, including within many
+  compound words. Hovering over `học sinh` may select only `học` or `sinh`.
 
 ## Get it running
 
